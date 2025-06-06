@@ -1,0 +1,17 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.format.settings.url": ".vscode/java-formatter.xml",
+    "cSpell.words": [
+        "Adminer",
+        "Configurer",
+        "Dockerized",
+        "Hikari",
+        "jdbc",
+        "Jwts",
+        "mvnw",
+        "psql",
+        "springdoc",
+        "SPRINGFRAMEWORK",
+        "taskmanager"
+    ]
+}

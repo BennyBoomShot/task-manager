@@ -1,0 +1,26 @@
+cd backend
+./mvnw spring-boot:run
+cd frontend
+npm install
+npm start
+docker run --name taskmanager-postgres \
+  -e POSTGRES_DB=taskmanager \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  -d postgres:16-alpine
+docker-compose up --build
+
+The services will be available at:
+Frontend: http://localhost
+Backend API: http://localhost:8080
+PostgreSQL: localhost:5432
+
+docker-compose down
+
+Check if there are any specific environment variables needed?
+
+However, I notice a few potential issues that should be addressed:
+The security configuration file (SecurityConfig.java) is missing, which is crucial for proper security setup.
+The JWT secret key in application.yml is using a default value, which should be changed in production.
+CORS is currently set to allow all origins (*), which might need to be restricted in production.
