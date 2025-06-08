@@ -139,59 +139,72 @@ API features:
 - Authentication support
 - Schema validation
 
-## Environment Variables
-
-### Backend
-
-```properties
-# Database Configuration
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/taskmanager
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
-SPRING_JPA_HIBERNATE_DDL_AUTO=update
-SPRING_JPA_SHOW_SQL=true
-SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true
-SPRING_JPA_OPEN_IN_VIEW=false
-
-# JWT Configuration
-JWT_SECRET=xXs52jwF9Uw4CPhzI1uPSbBxZvx0oyGhioe60LkCkuI=
-JWT_EXPIRATION=86400000
-JWT_REFRESH_EXPIRATION=604800000
-
-# Server Configuration
-SERVER_PORT=8080
-SERVER_SERVLET_CONTEXT_PATH=/api
-
-# Swagger/OpenAPI Configuration
-SPRINGDOC_API_DOCS_PATH=/api-docs
-SPRINGDOC_SWAGGER_UI_PATH=/swagger-ui.html
-SPRINGDOC_SWAGGER_UI_OPERATIONS_SORTER=method
-
-# Logging Configuration
-LOGGING_LEVEL_ROOT=INFO
-LOGGING_LEVEL_COM_TASKMANAGER=DEBUG
-LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
-```
-
-### Frontend
-
-```properties
-# API Configuration
-API_URL=http://localhost:8080/api
-
-# Angular Configuration
-ANGULAR_APP_ENV=production
-ANGULAR_APP_VERSION=1.0.0
-```
-
 ## Configuration
+
+### Environment Variables
+
+The application uses environment variables for configuration. Create a `.env` file in the root directory with the following variables:
+
+#### Database Configuration
+- `POSTGRES_DB`: Database name (defaults to taskmanager)
+- `POSTGRES_USER`: PostgreSQL username (defaults to postgres)
+- `POSTGRES_PASSWORD`: PostgreSQL password (defaults to postgres)
+
+#### JWT Configuration
+- `JWT_SECRET`: Secret key for JWT token signing (required)
+
+#### Server Configuration
+- `SERVER_PORT`: Backend server port (defaults to 8080)
+- `API_URL`: Frontend API URL (defaults to http://localhost:8080/api)
+
+#### Rate Limiting
+- `RATE_LIMIT_AUTH_REQUESTS`: Rate limit for auth requests (defaults to 5)
+- `RATE_LIMIT_AUTH_PERIOD`: Rate limit period in seconds (defaults to 60)
+- `RATE_LIMIT_API_REQUESTS`: Rate limit for API requests (defaults to 100)
+- `RATE_LIMIT_API_PERIOD`: Rate limit period in seconds (defaults to 60)
+
+#### Security
+- `PASSWORD_MIN_LENGTH`: Minimum password length (defaults to 12)
+- `PASSWORD_MAX_ATTEMPTS`: Maximum login attempts (defaults to 5)
+- `PASSWORD_LOCKOUT_DURATION`: Account lockout duration in milliseconds (defaults to 900000)
+
+#### CORS
+- `CORS_ALLOWED_ORIGINS`: Comma-separated list of allowed origins (defaults to http://localhost:4200)
+
+#### Logging
+- `LOG_LEVEL`: Root log level (defaults to INFO)
+- `LOG_LEVEL_COM_TASKMANAGER`: Application log level (defaults to DEBUG)
+- `LOG_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY`: Security log level (defaults to DEBUG)
+
+### Docker Configuration
+
+The application uses Docker Compose for orchestration with the following services:
+
+#### PostgreSQL Service
+- Image: postgres:16-alpine
+- Port: 5432
+- Persistent volume: postgres_data
+- Environment variables from .env file
+
+#### Backend Service
+- Build context: ./backend
+- Port: 8080
+- Environment variables:
+  - Database configuration
+  - JWT configuration
+  - Spring Boot configuration
+- Development watch mode for hot reload
+
+#### Frontend Service
+- Build context: ./frontend
+- Port: 80
+- Environment variables:
+  - API_URL for backend communication
+- Development watch mode for hot reload
 
 ### Backend Configuration
 
-The backend uses Spring Boot 3.2.3 with the following configurations:
-
 #### Server Configuration
-
 - Port: 8080
 - Context path: /api
 - Servlet container: Tomcat
@@ -199,7 +212,6 @@ The backend uses Spring Boot 3.2.3 with the following configurations:
 - API documentation at /api-docs and /swagger-ui.html
 
 #### Database Configuration
-
 - Type: PostgreSQL 16 (Alpine)
 - Connection pool: HikariCP
 - JPA/Hibernate configuration:
@@ -209,7 +221,6 @@ The backend uses Spring Boot 3.2.3 with the following configurations:
   - Open in view: false
 
 #### Security Configuration
-
 - JWT token expiration: 24 hours
 - Refresh token expiration: 7 days
 - Password encoder: BCrypt
@@ -221,18 +232,9 @@ The backend uses Spring Boot 3.2.3 with the following configurations:
 - CSRF protection: Disabled (stateless API)
 - Session management: Stateless
 
-#### Logging Configuration
-
-- Root level: INFO
-- Application level: DEBUG
-- Security level: DEBUG
-
 ### Frontend Configuration
 
-The frontend uses Angular 17 with the following configurations:
-
 #### Build Configuration
-
 - Production build:
   - Initial budget: 500kB (warning), 1MB (error)
   - Component style budget: 4kB (warning), 8kB (error)
@@ -243,7 +245,6 @@ The frontend uses Angular 17 with the following configurations:
   - License extraction: disabled
 
 #### Nginx Configuration
-
 - Port: 80
 - Root: /usr/share/nginx/html
 - Index: index.csr.html
@@ -258,7 +259,6 @@ The frontend uses Angular 17 with the following configurations:
   - HTML: no cache
 
 #### Performance Configuration
-
 - Lazy loading: Enabled
 - Server-side rendering: Enabled
 - Service worker: Enabled
@@ -267,15 +267,13 @@ The frontend uses Angular 17 with the following configurations:
 - Source maps: Development only
 
 ### Development Ports
-
 - Frontend:
   - Development: 4200
   - Production: 80
 - Backend:
-  - HTTP: 8080
+  - API: 8080
   - Debug: 5005
-- Database:
-  - PostgreSQL: 5432
+- Database: 5432
 
 ## Troubleshooting
 
@@ -356,81 +354,3 @@ If you have database connection problems:
    ```bash
    docker exec task-manager-postgres-1 psql -U postgres -d taskmanager
    ```
-
-### Restarting the Application
-
-To completely restart the application:
-
-1. Stop all containers:
-
-   ```bash
-   docker-compose down
-   ```
-
-2. Remove all related images:
-
-   ```bash
-   docker rmi task-manager-frontend task-manager-backend
-   ```
-
-3. Clean up Docker resources:
-
-   ```bash
-   docker system prune -f
-   ```
-
-4. Rebuild and start:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-### Important Notes
-
-1. Angular 17+ uses a new build system that generates:
-   - Client-side rendered files in the `browser` directory
-   - Server-side rendered files in the `server` directory
-   - Main entry point is `index.csr.html` for client-side rendering
-
-2. The Nginx configuration must point to the correct build output location:
-
-   ```nginx
-   root /usr/share/nginx/html/browser;
-   index index.csr.html;
-   ```
-
-3. The Dockerfile must copy files from the correct location:
-
-   ```dockerfile
-   COPY --from=build /app/dist/frontend /usr/share/nginx/html
-   ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-### Development Workflow
-
-1. Create a new branch from `main`
-2. Make your changes
-3. Write/update tests
-4. Update documentation
-5. Create a pull request
-6. Code review
-7. Merge to `main`
-
-### Code Style
-
-- Backend: Google Java Style Guide
-- Frontend: Angular Style Guide
-- Use Prettier for formatting
-- Follow ESLint rules
-- Write meaningful commit messages
-
-## License
-
-This project is licensed under the MIT License.

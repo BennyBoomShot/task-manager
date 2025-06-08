@@ -9,6 +9,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
+  // Skip token handling for auth-related endpoints
+  if (req.url.includes('/auth/')) {
+    return next(req);
+  }
+
   if (token) {
     req = req.clone({
       setHeaders: {

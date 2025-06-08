@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -31,10 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        boolean shouldNotFilter = path.startsWith("/api/auth/") || 
+        boolean shouldNotFilter = path.startsWith("/auth/") || 
                                  path.startsWith("/api-docs") || 
                                  path.startsWith("/swagger-ui");
-        logger.debug("shouldNotFilter called for path: {}, result: {}", path, shouldNotFilter);
+        logger.debug("JWT Filter - Request path: {}, should not filter: {}", path, shouldNotFilter);
         return shouldNotFilter;
     }
 
@@ -43,7 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                   @NonNull HttpServletResponse response,
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
-        logger.debug("doFilterInternal called for path: {}", requestURI);
+        logger.debug("JWT Filter - Processing request: {} with method: {}", requestURI, request.getMethod());
+        logger.debug("JWT Filter - Request headers: {}", Collections.list(request.getHeaderNames()).stream()
+            .collect(Collectors.toMap(
+                headerName -> headerName,
+                request::getHeader
+            )));
         try {
             String jwt = getJwtFromRequest(request);
             logger.debug("Processing request: {}", requestURI);

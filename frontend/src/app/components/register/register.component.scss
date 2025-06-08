@@ -28,3 +28,15 @@ mat-card-actions {
   justify-content: center;
   padding: 1rem;
 }
+
+.password-strength {
+  margin: -0.5rem 0 1rem;
+  padding: 0 1rem;
+
+  .strength-text {
+    display: block;
+    font-size: 12px;
+    margin-top: 4px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}

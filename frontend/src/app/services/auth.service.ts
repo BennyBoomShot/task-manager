@@ -70,6 +70,21 @@ export class AuthService {
       }),
       catchError(error => {
         console.error('Registration error:', error);
+        let errorMessage = 'Registration failed. Please try again.';
+
+        if (error.error?.message) {
+          // Handle specific password validation error
+          if (error.error.message.includes('Password must be at least 8 characters')) {
+            errorMessage = 'Password must be at least 8 characters long and contain at least one digit, one uppercase letter, one lowercase letter, and one special character.';
+          } else {
+            errorMessage = error.error.message;
+          }
+        }
+
+        this.snackBar.open(errorMessage, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
         return throwError(() => error);
       })
     );
@@ -86,6 +101,8 @@ export class AuthService {
       }),
       catchError(error => {
         console.error('Login error:', error);
+        const errorMessage = error.error?.message || 'Login failed. Please check your credentials.';
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
         return throwError(() => error);
       })
     );

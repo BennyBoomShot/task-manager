@@ -13,5 +13,6 @@
         "springdoc",
         "SPRINGFRAMEWORK",
         "taskmanager"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
