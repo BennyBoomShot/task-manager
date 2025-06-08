@@ -33,24 +33,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getRequestURI();
-        boolean shouldNotFilter = path.startsWith("/auth/") || 
-                                 path.startsWith("/api-docs") || 
-                                 path.startsWith("/swagger-ui");
+        boolean shouldNotFilter = path.startsWith("/auth/") || path.startsWith("/api-docs")
+                || path.startsWith("/swagger-ui");
         logger.debug("JWT Filter - Request path: {}, should not filter: {}", path, shouldNotFilter);
         return shouldNotFilter;
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                  @NonNull HttpServletResponse response,
-                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
         logger.debug("JWT Filter - Processing request: {} with method: {}", requestURI, request.getMethod());
         logger.debug("JWT Filter - Request headers: {}", Collections.list(request.getHeaderNames()).stream()
-            .collect(Collectors.toMap(
-                headerName -> headerName,
-                request::getHeader
-            )));
+                .collect(Collectors.toMap(headerName -> headerName, request::getHeader)));
         try {
             String jwt = getJwtFromRequest(request);
             logger.debug("Processing request: {}", requestURI);
@@ -73,8 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             logger.debug("User details loaded successfully for: {}", username);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                    null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -94,4 +89,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-} 
+}

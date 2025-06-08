@@ -23,10 +23,8 @@ public class AuthController {
     private final UserService userService;
     private final UserDetailsService userDetailsService;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                         JwtTokenUtil jwtTokenUtil,
-                         UserService userService,
-                         UserDetailsService userDetailsService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil,
+            UserService userService, UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userService = userService;
@@ -36,11 +34,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
-        );
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenUtil.generateToken(userDetails);
@@ -58,7 +52,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshRequest) {
         String refreshToken = refreshRequest.getRefreshToken();
-        
+
         if (refreshToken != null && jwtTokenUtil.validateToken(refreshToken)) {
             String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -89,11 +83,7 @@ public class AuthController {
 
         // Authenticate the user after registration
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                registerRequest.getUsername(),
-                registerRequest.getPassword()
-            )
-        );
+                new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenUtil.generateToken(userDetails);
@@ -179,4 +169,4 @@ class RegisterRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-} 
+}

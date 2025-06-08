@@ -37,7 +37,7 @@ public class TaskController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task taskDetails,
-                                         Authentication authentication) {
+            Authentication authentication) {
         return ResponseEntity.ok(taskService.updateTask(id, taskDetails, authentication.getName()));
     }
 
@@ -48,8 +48,7 @@ public class TaskController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Task>> getTasksByStatus(@PathVariable TaskStatus status,
-                                                     Authentication authentication) {
+    public ResponseEntity<List<Task>> getTasksByStatus(@PathVariable TaskStatus status, Authentication authentication) {
         return ResponseEntity.ok(taskService.getTasksByStatus(authentication.getName(), status));
     }
-} 
+}
